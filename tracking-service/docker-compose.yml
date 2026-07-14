@@ -1,0 +1,22 @@
+# Runs the Tracking service: Redis (the ONLY store), the thin Node API, and the
+# built React UI served as static files. On AWS Lightsail this lives on the
+# tracking VM, which also hosts the gateway (see ../gateway).
+services:
+  redis:
+    image: redis:7-alpine
+    # No volume on purpose: GPS pings are ephemeral, so there is nothing worth
+    # persisting across restarts.
+
+  tracking:
+    build: ./server
+    environment:
+      REDIS_URL: redis://redis:6379
+    ports:
+      - "8083:8083"
+    depends_on:
+      - redis
+
+  web:
+    build: ./client
+    ports:
+      - "5173:80"

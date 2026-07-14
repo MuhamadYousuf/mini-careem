@@ -1,0 +1,7 @@
+Django>=4.2,<5.0
+djangorestframework>=3.14
+mongoengine>=0.27
+# Test-only: an in-memory MongoDB so the suite needs no real database.
+mongomock>=4.1
+# Production WSGI server used inside the container.
+gunicorn>=21.2

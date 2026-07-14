@@ -1,0 +1,33 @@
+# Runs the Wallet service next to its OWN private MySQL.
+# On AWS Lightsail this whole file lives on the wallet VM.
+services:
+  wallet-db:
+    image: mysql:8.0
+    environment:
+      MYSQL_DATABASE: wallet
+      MYSQL_USER: wallet
+      MYSQL_PASSWORD: walletpass
+      MYSQL_ROOT_PASSWORD: rootpass
+    volumes:
+      - wallet-data:/var/lib/mysql
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  wallet:
+    build: .
+    environment:
+      DB_URL: jdbc:mysql://wallet-db:3306/wallet
+      DB_USER: wallet
+      DB_PASSWORD: walletpass
+    ports:
+      # Exposed on the VM's PRIVATE network; only the gateway reaches it.
+      - "8081:8081"
+    depends_on:
+      wallet-db:
+        condition: service_healthy
+
+volumes:
+  wallet-data:

@@ -1,0 +1,26 @@
+# Runs the Drivers service next to its OWN private MongoDB.
+# On AWS Lightsail this whole file lives on the drivers VM.
+services:
+  drivers-db:
+    image: mongo:6.0
+    volumes:
+      - drivers-data:/data/db
+    healthcheck:
+      test: ["CMD", "mongosh", "--eval", "db.adminCommand('ping')"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  drivers:
+    build: .
+    environment:
+      MONGODB_URI: mongodb://drivers-db:27017/drivers
+    ports:
+      # Exposed on the VM's PRIVATE network; only the gateway reaches it.
+      - "8082:8082"
+    depends_on:
+      drivers-db:
+        condition: service_healthy
+
+volumes:
+  drivers-data:

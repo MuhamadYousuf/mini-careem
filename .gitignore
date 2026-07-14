@@ -1,0 +1,66 @@
+# ---------------------------------------------------------------------------
+# mini-Careem — root .gitignore
+# Covers all three stacks (Java/Maven, Python/Django, Node/React) plus Docker,
+# IDEs and OS cruft. The per-service .gitignore files add nothing beyond this.
+# ---------------------------------------------------------------------------
+
+# --- Secrets / local env ---
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+
+# --- Java / Spring / Maven (wallet-service) ---
+target/
+build/
+*.class
+*.jar
+*.war
+hs_err_pid*
+
+# --- Python / Django (drivers-service) ---
+__pycache__/
+*.py[cod]
+*$py.class
+*.egg-info/
+.venv/
+venv/
+env/
+db.sqlite3
+db.sqlite3-journal
+.pytest_cache/
+.mypy_cache/
+.coverage
+htmlcov/
+
+# --- Node / React / Vite (tracking-service) ---
+node_modules/
+dist/
+.vite/
+coverage/
+npm-debug.log*
+yarn-debug.log*
+pnpm-debug.log*
+*.tsbuildinfo
+
+# --- Docker ---
+# compose files and Dockerfiles ARE tracked; only local overrides are ignored
+docker-compose.override.yml
+
+# --- Logs ---
+*.log
+logs/
+
+# --- IDEs / editors ---
+.idea/
+*.iml
+.vscode/
+*.swp
+*.swo
+*~
+
+# --- OS ---
+.DS_Store
+Thumbs.db
+desktop.ini

@@ -1,0 +1,19 @@
+# Wallet service configuration.
+# Values default to the docker-compose setup but can be overridden with env vars,
+# which is how the same image runs locally and on AWS Lightsail.
+server:
+  port: 8081
+
+spring:
+  datasource:
+    url: ${DB_URL:jdbc:mysql://localhost:3306/wallet?createDatabaseIfNotExist=true}
+    username: ${DB_USER:wallet}
+    password: ${DB_PASSWORD:walletpass}
+  jpa:
+    hibernate:
+      # Auto-create the schema for the demo. Use migrations (Flyway) in production.
+      ddl-auto: update
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.MySQL8Dialect
+    open-in-view: false

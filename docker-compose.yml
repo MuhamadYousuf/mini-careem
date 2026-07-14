@@ -1,0 +1,68 @@
+# ALL-IN-ONE local stack for the demo.
+#
+# This runs every service, every database, the React UI and the gateway on ONE
+# machine so you can try the whole system with a single command:
+#
+#   docker compose up --build
+#   open http://localhost:8080
+#
+# In PRODUCTION these do NOT live together: each service + its database goes on
+# its own AWS Lightsail VM (see each service's own docker-compose.yml and GUIDE.md).
+services:
+  # --- Wallet (Java / Spring / MySQL) ---
+  wallet-db:
+    image: mysql:8.0
+    environment:
+      MYSQL_DATABASE: wallet
+      MYSQL_USER: wallet
+      MYSQL_PASSWORD: walletpass
+      MYSQL_ROOT_PASSWORD: rootpass
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+  wallet:
+    build: ./wallet-service
+    environment:
+      DB_URL: jdbc:mysql://wallet-db:3306/wallet
+      DB_USER: wallet
+      DB_PASSWORD: walletpass
+    depends_on:
+      wallet-db:
+        condition: service_healthy
+
+  # --- Drivers (Python / Django / MongoDB) ---
+  drivers-db:
+    image: mongo:6.0
+  drivers:
+    build: ./drivers-service
+    environment:
+      MONGODB_URI: mongodb://drivers-db:27017/drivers
+    depends_on:
+      - drivers-db
+
+  # --- Tracking (Node / Redis) + React UI ---
+  redis:
+    image: redis:7-alpine
+  tracking:
+    build: ./tracking-service/server
+    environment:
+      REDIS_URL: redis://redis:6379
+    depends_on:
+      - redis
+  web:
+    build: ./tracking-service/client
+
+  # --- The one front door ---
+  gateway:
+    image: nginx:1.27-alpine
+    volumes:
+      - ./gateway/nginx.local.conf:/etc/nginx/nginx.conf:ro
+    ports:
+      - "8080:80"
+    depends_on:
+      - wallet
+      - drivers
+      - tracking
+      - web
