@@ -26,6 +26,26 @@ React map (browser)  ──poll every 3s──▶  Node/Express (thin)  ──�
 - The React client polls `GET /pings` and redraws markers on a plain SVG map
   (no map library or tiles — kept basic on purpose).
 
+## Two pages
+
+The React app has two tabs (top nav):
+
+- **Ride Demo** (`RideDemo.jsx`) — the headline. It runs the whole **ride
+  lifecycle** in the browser and composes all three services through the
+  gateway: the customer requests a ride (Wallet creates + funds a wallet), a
+  driver is assigned (Drivers picks/creates an ACTIVE captain), the driver
+  animates toward the pickup while streaming GPS pings (Tracking), the ride goes
+  **Started → Stopped**, then the customer pays and the driver's standing
+  balance updates (Wallet transfer) → **Complete**. Any step that fails flips the
+  ride to **Failed** with the reason. A "Demo a failure" dropdown forces the
+  no-driver, tracking-drop, or insufficient-funds paths on demand (the last one
+  is a *real* 422 from the Wallet service).
+- **Live Map** (`LiveMap.jsx`) — the raw tracking feed: every driver's latest
+  ping, polled every few seconds.
+
+The ride state machine lives entirely on the client — a faithful, runnable
+version of the deck's "one ride, three services" slide. It changes no backend.
+
 ## API
 
 Base path (behind the gateway): `/api/tracking`
@@ -67,14 +87,17 @@ cd server && npm install && npm test
 Covers the store (save/get/list, TTL is set, overwrite) and the HTTP layer
 (health, create, validation, list, 404).
 
-Frontend (React) — uses **Vitest + Testing Library**, with `fetch` stubbed:
+Frontend (React) — uses **Vitest + Testing Library**:
 
 ```bash
 cd client && npm install && npm test
 ```
 
-Covers the coordinate projection helper and that `LiveMap` renders the drivers
-returned by the API and warns when the API is unreachable.
+29 tests: the fare model, the ride status machine, geo helpers
+(project/lerp/haversine), the orchestrator's service composition and every
+failure reason (with an injected fake API), the full `RideDemo` happy path
+(asserting the driver balance actually changes) plus its no-driver and
+insufficient-funds failure paths, and the original `LiveMap` feed.
 
 ## Layout
 
@@ -85,8 +108,13 @@ server/
   index.js      # production entry point
   *.test.js     # jest + ioredis-mock
 client/
-  src/geo.js    # pure lat/lng -> svg projection (unit-tested)
-  src/api.js    # fetch wrapper
-  src/LiveMap.jsx   # polling live map + table + ping simulator
-  src/*.test.*  # vitest + testing-library
+  src/geo.js         # pure geometry: project + lerp + haversineKm (unit-tested)
+  src/api.js         # fetch wrappers for wallet + drivers + tracking
+  src/ride/fare.js       # fare model (unit-tested)
+  src/ride/rideStatus.js # the ride state machine (unit-tested)
+  src/ride/orchestrator.js # composes the 3 services, injectable (unit-tested)
+  src/RideDemo.jsx   # animated ride lifecycle page (headline)
+  src/LiveMap.jsx    # raw tracking feed page
+  src/App.jsx        # tab nav between the two pages
+  src/*.test.*       # vitest + testing-library
 ```
