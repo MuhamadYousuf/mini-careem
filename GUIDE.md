@@ -16,6 +16,11 @@ The point of the demo is a single idea from the talk:
 
 ## The big picture
 
+![mini-Careem system architecture](./docs/architecture.svg)
+
+<details>
+<summary>Text version (mermaid)</summary>
+
 ```mermaid
 flowchart TD
     Client([Rider's phone]) -->|one address, :80| GW[API Gateway - Nginx]
@@ -27,6 +32,8 @@ flowchart TD
     D --> DDB[(MongoDB<br/>documents)]
     T --> TDB[(Redis<br/>in-memory)]
 ```
+
+</details>
 
 Clients see **one address**. The gateway routes by URL path to the right
 service. No service knows the others' databases exist; they talk only through

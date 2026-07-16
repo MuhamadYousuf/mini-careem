@@ -8,6 +8,8 @@ Nginx gateway, deployable as Docker containers on AWS Lightsail.
 - **Drivers** — Python · Django · MongoDB — flexible document profiles
 - **Tracking** — JavaScript · Node + React · Redis — ephemeral live GPS
 
+![mini-Careem system architecture](./docs/architecture.svg)
+
 **Start here → [GUIDE.md](./GUIDE.md)** for the architecture, the run-it-locally
 command, testing, and the AWS Lightsail deployment steps. Each service also has
 its own README explaining why its stack is the right one.
