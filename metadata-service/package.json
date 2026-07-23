@@ -1,0 +1,23 @@
+{
+  "name": "metadata-service",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "jest --detectOpenHandles --forceExit"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "dependencies": {
+    "express": "^5.2.1",
+    "ioredis": "^5.11.1",
+    "sqlite3": "^6.0.1"
+  },
+  "devDependencies": {
+    "ioredis-mock": "^8.13.1",
+    "jest": "^30.4.2",
+    "supertest": "^7.2.2"
+  }
+}
