@@ -54,6 +54,15 @@ services:
   web:
     build: ./tracking-service/client
 
+  # --- Metadata (Node / SQLite / Redis) ---
+  metadata-service:
+    build: ./metadata-service
+    environment:
+      - PORT=3004
+      - REDIS_URL=redis://redis:6379
+    depends_on:
+      - redis
+
   # --- The one front door ---
   gateway:
     image: nginx:1.27-alpine
@@ -66,3 +75,4 @@ services:
       - drivers
       - tracking
       - web
+      - metadata-service
